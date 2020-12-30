@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <pre id="out"></pre>
+    <script type="module">
+        import { parseSNBT } from './src/snbt/parser.js';
+
+        const parsedData = parseSNBT('{"hello":"world","nested":{"words":"are cool even with \\"quotes\\"","num":666,"byte":32b},"list":["hello","words"]}')
+
+        document.querySelector("#out").innerHTML = JSON.stringify(parsedData, null, 2)
+
+        console.log(parsedData);
+    </script>
+</body>
+</html>
