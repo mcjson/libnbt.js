@@ -1,19 +1,9 @@
 import {
     digits,
-    between,
-    many,
-    sepBy,
-    recursiveParser,
     choice,
     char,
-    sequenceOf,
-    anyCharExcept,
-    str,
     possibly,
     takeLeft,
-    takeRight,
-    endOfInput,
-    optionalWhitespace
 } from 'arcsecond';
 
 import {
