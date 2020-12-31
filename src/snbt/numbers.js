@@ -16,7 +16,7 @@ import {
     betweenBrackets,
     quotedString,
     commaSeparated
-} from './utils.js';
+} from '../utils.js';
 
 export const signedNumber = joinedSequence([possibly(char('-')),digits]).map(parseInt);
 export const signedDecimal = joinedSequence([signedNumber, possibly(joinedSequence([char("."), signedNumber]))]).map(parseFloat)

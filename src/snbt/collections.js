@@ -3,6 +3,7 @@ import {
     choice,
     char,
     sequenceOf,
+    anyCharExcept
 } from 'arcsecond';
 
 import {
@@ -11,8 +12,9 @@ import {
     betweenSquareBrackets,
     betweenBrackets,
     quotedString,
-    commaSeparated
-} from './utils.js';
+    commaSeparated,
+    joinedMany
+} from '../utils.js';
 
 import { stringTag } from './string.js';
 
@@ -59,7 +61,7 @@ export const tagList = betweenSquareBrackets(commaSeparated(anyTag)).map(typeMap
 
 //Compound tag
 const namedTag = sequenceOf([
-    quotedString,
+    withinWhitespace(joinedMany(anyCharExcept(char (':')))),
     withinWhitespace(char(':')),
     anyTag
 ]).map( ([n,_, v]) => [n,v])

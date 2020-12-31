@@ -8,13 +8,17 @@
 <body>
     <pre id="out"></pre>
     <script type="module">
+
+        const logOut = s => document.querySelector("#out").innerHTML += JSON.stringify(s, null,2) + "\n";
         import { parseSNBT } from './src/snbt/parser.js';
 
-        const parsedData = parseSNBT('{"hello":"world","nested":{"words":"are cool even with \\"quotes\\"","num":666,"byte":32b},"list":["hello","words"]}')
+        import { parseItemStack } from './src/item/parser.js';
 
-        document.querySelector("#out").innerHTML = JSON.stringify(parsedData, null, 2)
-
-        console.log(parsedData);
+        logOut(
+            parseItemStack(
+                'minecraft:chest[facing=north,type=single,waterlogged=false]{Items:[{Slot:0b,id:"minecraft:bread",Count:2b},{Slot:17b,id:"minecraft:minecart",Count:1b}]}'
+                )
+            );
     </script>
 </body>
 </html>

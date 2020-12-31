@@ -8,7 +8,7 @@ import {
     typeMap,
     betweenSquareBrackets,
     commaSeparated
-} from './utils.js';
+} from '../utils.js';
 
 import {
     signedNumber,
