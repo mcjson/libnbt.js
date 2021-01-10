@@ -11,7 +11,7 @@
   "dependencies": {
     "arcsecond": "^3.1.2",
     "arcsecond-binary": "^2.0.0",
-    "pako": "^2.0.2"
+    "pako": "^2.0.3"
   },
   "devDependencies": {
     "snowpack": "^2.18.5"
