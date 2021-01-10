@@ -1,24 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <pre id="out"></pre>
     <script type="module">
+      const logOut = (s) =>
+        (document.querySelector("#out").innerHTML +=
+          JSON.stringify(s, 
+          (key, value) =>
+            typeof value === 'bigint'
+                ? value.toString()
+                : value // return everything else unchanged
+          , 2) + "\n");
+      import { parseSNBT } from "./src/snbt/parser.js";
+      import { toSNBT } from "./src/snbt/stringifier.js";
 
-        const logOut = s => document.querySelector("#out").innerHTML += JSON.stringify(s, null,2) + "\n";
-        import { parseSNBT } from './src/snbt/parser.js';
+      import { parseItemStack, toItemSNBT } from "./src/item/parser.js";
 
-        import { parseItemStack } from './src/item/parser.js';
+      const itemStackString =
+        'minecraft:chest[facing=north,type=single,waterlogged=false]{Items:[{Slot:0b,id:"minecraft:bread",Count:2b},{Slot:17b,id:"minecraft:minecart",Count:1b}]}';
+      const itemStackParsed = parseItemStack(itemStackString);
 
-        logOut(
-            parseItemStack(
-                'minecraft:chest[facing=north,type=single,waterlogged=false]{Items:[{Slot:0b,id:"minecraft:bread",Count:2b},{Slot:17b,id:"minecraft:minecart",Count:1b}]}'
-                )
-            );
+      logOut(itemStackString);
+      logOut(itemStackParsed);
+
+      const resaved = toItemSNBT(itemStackParsed);
+      logOut(resaved);
+      logOut(itemStackString);
+      logOut({ equalStrings: resaved === itemStackString });
+
+      import { parseNBT } from "./src/nbt/tag.js";
+      import pako from "pako";
+
+      (async () => {
+          const data = await (await fetch("./fixtures/bigtest.nbt")).arrayBuffer()
+        const view = new Uint8Array(data);
+        if (view[0] == 0x1f && view[1] == 0x8b) {
+          console.log("GZIP detected, inflating");
+          data = pako.inflate(data);
+        } else {
+          console.log("No GZIP detected");
+        }
+        let t1 = Date.now();
+        const parsed = parseNBT(data);
+        logOut(`Time taken to parse: ${(Date.now() - t1) / 1000}`);
+        logOut(parsed);
+      })();
     </script>
-</body>
+  </body>
 </html>

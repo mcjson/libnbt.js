@@ -34,6 +34,6 @@ export const shortTag = numberTag(-32768, 32767)(withSuffix('s')(signedNumber)).
 export const intTag = numberTag(-2147483648, 2147483647)(signedNumber).map(typeMap('int'));
 export const longTag = withSuffix('l')(signedNumber).map(typeMap('long'));
 
-export const floatTag = (withSuffix('f')(signedNumber)).map(typeMap('float'));
-export const doubleTag = (withSuffix('f')(signedNumber)).map(typeMap('double'));
+export const floatTag = (withSuffix('f')(signedDecimal)).map(typeMap('float'));
+export const doubleTag = (withSuffix('d')(signedDecimal)).map(typeMap('double'));
 

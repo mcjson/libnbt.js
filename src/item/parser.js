@@ -6,6 +6,7 @@ import {
     endOfInput
 } from 'arcsecond';
 import { compoundTag } from '../snbt/collections';
+import { toSNBT } from '../snbt/stringifier';
 import { commaSeparated, withinWhitespace, betweenSquareBrackets } from '../utils';
 
 
@@ -32,8 +33,28 @@ const itemParser = sequenceOf([
     }),
     possibly(blockStateParser),
     // possibly(compoundTag),
-    compoundTag,
+    possibly(compoundTag),
     endOfInput
 ]).map( ([item, blockstate, tag]) => ({ item, blockstate, tag}));
 
-export const parseItemStack = data => itemParser.run(data);
+export const parseItemStack = data => itemParser.run(data).result;
+
+export const toItemSNBT = itemStack => {
+    const {item, blockstate, tag} = itemStack;
+
+
+
+    return item + (
+        blockstate 
+        ?
+        "[" + Object.entries(blockstate).map( a => a.join("=")).join(",") + "]"
+        :
+        ""
+    ) + (
+        tag
+        ?
+        toSNBT(tag)
+        :
+        ""
+    )
+}

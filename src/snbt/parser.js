@@ -8,4 +8,4 @@ import { compoundTag } from './collections';
 
 
 
-export const parseSNBT = data => sequenceOf([compoundTag, endOfInput]).run(data)
+export const parseSNBT = data => sequenceOf([compoundTag, endOfInput]).run(data).result;

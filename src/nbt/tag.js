@@ -19,7 +19,7 @@ const tagNameList = [
 
 const prefixedLength = pLength => pArray => pLength.chain( len => len == 0 ? succeedWith([]) : exactly(len)(pArray))
 
-const type = type => p => p; //.map( v => ( {[type]: v } ))
+const type = type => p => p.map( value => ({type, value}))
 
 const prefixedString = prefixedLength(s16BE)(u8).map( v => v.map( e => String.fromCharCode(e)).join('') );
 
@@ -28,7 +28,6 @@ const namedTag = s8.chain( type => {
         throw new Error(`invalid type of ${type} found.`);
     }
     if(type == 0){
-        console.log("Hit end tag");
         return fail('END_TAG');
     }
     return sequenceOf([
@@ -48,16 +47,9 @@ const doubleTag =  type("double")(exactly(8)(u8).map( v => (new DataView( (new U
 
 const byteArrayTag = type("byteArray")(prefixedLength(s32BE)(s8));
 const stringTag = type("string")(prefixedString);
-const listTag = type("list")(sequenceOf([s8, s32BE]).chain( ([type, len]) => {
-    console.log(`LIST: ${tagNameList[type]}[${len}]`);
-    return len == 0 ? succeedWith([]) : exactly(len)(tagsList[type]);
-})).map( v => {
-    console.log("list", v)
-    return v;
-});
+const listTag = type("list")(sequenceOf([s8, s32BE]).chain( ([type, len]) => len == 0 ? succeedWith([]) : exactly(len)(tagsList[type]) ));
 
 const compoundTag = takeLeft(many(namedTag))(endTag).map( v => {
-    console.log("COMPOUND_FORMED");
     return v.reduce((o, {name, value}) => ({...o, [name]: value}), {})
 });
 
@@ -89,4 +81,10 @@ export const taggedNBT = (b, parser) => sequenceOf([
 ]);
 
 
-export const parseNBT = data => namedTag.run(data)
+export const parseNBT = data => namedTag.map( ({name, value}) => {
+    if(name == ""){
+        return value;
+    }else{
+        return ({ [name]: value });
+    }
+}).run(data).result;
