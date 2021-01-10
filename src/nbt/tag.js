@@ -1,5 +1,6 @@
 import { exactU8, s16BE, s32BE, s8, u8, u32BE } from 'arcsecond-binary';
 import { sequenceOf, exactly, takeLeft, many, fail, succeedWith } from 'arcsecond';
+import pako from "pako";
 
 const tagNameList = [
     "end",
@@ -45,7 +46,7 @@ const longTag =  type("long")(exactly(8)(u8).map( v => (new DataView( (new Uint8
 const floatTag =  type("float")( exactly(4)(u8).map( v => (new DataView( (new Uint8Array(v)).buffer )).getFloat32(0,false) ) );
 const doubleTag =  type("double")(exactly(8)(u8).map( v => (new DataView( (new Uint8Array(v)).buffer )).getFloat64(0,false) ) );
 
-const byteArrayTag = type("byteArray")(prefixedLength(s32BE)(s8));
+const byteArrayTag = type("byte_array")(prefixedLength(s32BE)(s8).map( v => new Int8Array(v)));
 const stringTag = type("string")(prefixedString);
 const listTag = type("list")(sequenceOf([s8, s32BE]).chain( ([type, len]) => len == 0 ? succeedWith([]) : exactly(len)(tagsList[type]) ));
 
@@ -53,8 +54,8 @@ const compoundTag = takeLeft(many(namedTag))(endTag).map( v => {
     return v.reduce((o, {name, value}) => ({...o, [name]: value}), {})
 });
 
-const intArrayTag = type("intArray")(prefixedLength(s32BE)(s32BE));
-const longArrayTag = type("longArray")(prefixedLength(s32BE)(longTag));
+const intArrayTag = type("int_array")(prefixedLength(s32BE)(s32BE));
+const longArrayTag = type("long_array")(prefixedLength(s32BE)(longTag));
 
 
 
@@ -81,10 +82,17 @@ export const taggedNBT = (b, parser) => sequenceOf([
 ]);
 
 
-export const parseNBT = data => namedTag.map( ({name, value}) => {
+export const parseNBT = data => {
+    const view = new Uint8Array(data);
+    if (view[0] == 0x1f && view[1] == 0x8b) {
+        console.log("GZIP detected, inflating");
+        data = pako.inflate(data);
+    }
+    return namedTag.map( ({name, value}) => {
     if(name == ""){
         return value;
     }else{
         return ({ [name]: value });
     }
 }).run(data).result;
+}

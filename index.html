@@ -9,12 +9,25 @@
     <pre id="out"></pre>
     <script type="module">
       const logOut = (s) =>
-        (document.querySelector("#out").innerHTML +=
+        (document.querySelector("#out").innerText +=
           JSON.stringify(s, 
           (key, value) =>
-            typeof value === 'bigint'
-                ? value.toString()
-                : value // return everything else unchanged
+          {
+            if(typeof value === 'bigint'){
+              return value.toString()
+            }
+            if(value instanceof Int8Array){
+              return "byte[" + value.length + "]"
+            }
+            if(value instanceof Int32Array){
+              return "int[" + value.length + "]"
+            }
+            if(value instanceof BigInt64Array){
+              return "long[" + value.length + "]"
+            }
+            return value // return everything else unchanged
+
+          }
           , 2) + "\n");
       import { parseSNBT } from "./src/snbt/parser.js";
       import { toSNBT } from "./src/snbt/stringifier.js";
@@ -34,17 +47,10 @@
       logOut({ equalStrings: resaved === itemStackString });
 
       import { parseNBT } from "./src/nbt/tag.js";
-      import pako from "pako";
+      
 
       (async () => {
           const data = await (await fetch("./fixtures/bigtest.nbt")).arrayBuffer()
-        const view = new Uint8Array(data);
-        if (view[0] == 0x1f && view[1] == 0x8b) {
-          console.log("GZIP detected, inflating");
-          data = pako.inflate(data);
-        } else {
-          console.log("No GZIP detected");
-        }
         let t1 = Date.now();
         const parsed = parseNBT(data);
         logOut(`Time taken to parse: ${(Date.now() - t1) / 1000}`);
