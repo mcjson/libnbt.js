@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody id="output">
+
+      </tbody>
+    </table>
+    <input type="file" accept=".nbt" id="input"/>
+    <script type="module">
+
+      const makeRow = (name, qty) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${name}</td><td>${qty}</td>`;
+        document.querySelector("#output").appendChild(tr);
+      }
+
+      
+
+      import { parseNBT } from "./src/nbt/tag.js";
+
+      document.querySelector("#input").addEventListener("change", async ev => {
+        const output = document.querySelector("#output");
+        
+        if(ev.target.files.length > 0){
+          console.log("Parsing data");
+          const data = await ev.target.files[0].arrayBuffer()
+          console.log(data);
+          output.innerHTML = "";
+          const { value: parsed } = parseNBT(data);
+          console.log("Parsed data");
+          console.log(parsed);
+          
+          const materialsList = parsed.blocks.value
+              .map( ({state: {value}}) => value)
+              .filter( s => parsed.palette.value[s].Name.value != "minecraft:air") //Filter out air
+              .reduce( (a,s) => ({...a, [parsed.palette.value[s].Name.value]: (a[parsed.palette.value[s].Name.value] ?? 0) + 1 }), {})
+          ;
+          makeRow("Raw", "<pre>" + JSON.stringify(materialsList, null, 2) + "</pre>")
+
+          Object.entries(materialsList).sort( ([_,a], [__,b]) => Math.sign(b-a) ).map( ([k,v]) => makeRow(k,v))
+
+
+          
+          
+        }
+
+
+      });
+    </script>
+  </body>
+</html>

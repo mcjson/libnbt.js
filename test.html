@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre id="out"></pre>
+    <script type="module">
+      const logOut = (s) =>
+        (document.querySelector("#out").innerText +=
+          JSON.stringify(s, 
+          (key, value) =>
+          {
+            if(typeof value === 'bigint'){
+              return value.toString()
+            }
+            if(value instanceof Int8Array){
+              return "byte[" + value.length + "]"
+            }
+            if(value instanceof Int32Array){
+              return "int[" + value.length + "]"
+            }
+            if(value instanceof BigInt64Array){
+              return "long[" + value.length + "]"
+            }
+            return value // return everything else unchanged
+
+          }
+          , 2) + "\n");
+      import { parseSNBT } from "./src/snbt/parser.js";
+      import { toSNBT } from "./src/snbt/stringifier.js";
+
+      import { parseItemStack, toItemSNBT } from "./src/item/parser.js";
+
+      const itemStackString =
+        'minecraft:chest[facing=north,type=single,waterlogged=false]{Items:[{Slot:0b,id:"minecraft:bread",Count:2b},{Slot:17b,id:"minecraft:minecart",Count:1b}]}';
+      const itemStackParsed = parseItemStack(itemStackString);
+
+      logOut(itemStackString);
+      logOut(itemStackParsed);
+
+      const resaved = toItemSNBT(itemStackParsed);
+      logOut(resaved);
+      logOut(itemStackString);
+      logOut({ equalStrings: resaved === itemStackString });
+
+      import { parseNBT } from "./src/nbt/tag.js";
+      
+
+      (async () => {
+          const data = await (await fetch("./fixtures/vendor6.nbt")).arrayBuffer()
+        let t1 = Date.now();
+        const parsed = parseNBT(data);
+        logOut(`Time taken to parse: ${(Date.now() - t1) / 1000}`);
+        logOut(parsed);
+        console.log("NBT", parsed);
+      })();
+    </script>
+  </body>
+</html>

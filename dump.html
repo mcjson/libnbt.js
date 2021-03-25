@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+
+    <input type="file" accept=".nbt" id="input"/>
+    <script type="module">
+
+      import { parseNBT } from "./src/nbt/tag.js";
+
+      document.querySelector("#input").addEventListener("change", async ev => {
+        const output = document.querySelector("#output");
+        
+        if(ev.target.files.length > 0){
+          console.log("Parsing data");
+          const d = Date.now();
+          const data = await ev.target.files[0].arrayBuffer()
+          const parsed = parseNBT(data);
+          console.log("Parsed data, took", Date.now() - d, "ms");
+          console.log(parsed);
+          
+        }
+
+
+      });
+    </script>
+  </body>
+</html>

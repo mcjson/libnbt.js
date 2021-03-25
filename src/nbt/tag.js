@@ -86,13 +86,9 @@ export const parseNBT = data => {
     const view = new Uint8Array(data);
     if (view[0] == 0x1f && view[1] == 0x8b) {
         console.log("GZIP detected, inflating");
+        const d = Date.now()
         data = pako.inflate(data);
+        console.log("Deflation took", Date.now() - d, "ms");
     }
-    return namedTag.map( ({name, value}) => {
-    if(name == ""){
-        return value;
-    }else{
-        return ({ [name]: value });
-    }
-}).run(data).result;
+    return namedTag.run(data).result;
 }
