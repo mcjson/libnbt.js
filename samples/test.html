@@ -29,10 +29,10 @@
 
           }
           , 2) + "\n");
-      import { parseSNBT } from "./src/snbt/parser.js";
-      import { toSNBT } from "./src/snbt/stringifier.js";
+      import { parseSNBT } from "../src/snbt/parser.js";
+      import { toSNBT } from "../src/snbt/stringifier.js";
 
-      import { parseItemStack, toItemSNBT } from "./src/item/parser.js";
+      import { parseItemStack, toItemSNBT } from "../src/item/parser.js";
 
       const itemStackString =
         'minecraft:chest[facing=north,type=single,waterlogged=false]{Items:[{Slot:0b,id:"minecraft:bread",Count:2b},{Slot:17b,id:"minecraft:minecart",Count:1b}]}';
@@ -46,11 +46,11 @@
       logOut(itemStackString);
       logOut({ equalStrings: resaved === itemStackString });
 
-      import { parseNBT } from "./src/nbt/tag.js";
+      import { parseNBT } from "../src/nbt/tag.js";
       
 
       (async () => {
-          const data = await (await fetch("./fixtures/vendor6.nbt")).arrayBuffer()
+          const data = await (await fetch("../fixtures/vendor6.nbt")).arrayBuffer()
         let t1 = Date.now();
         const parsed = parseNBT(data);
         logOut(`Time taken to parse: ${(Date.now() - t1) / 1000}`);

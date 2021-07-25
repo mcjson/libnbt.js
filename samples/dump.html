@@ -10,7 +10,7 @@
     <input type="file" accept=".nbt" id="input"/>
     <script type="module">
 
-      import { parseNBT } from "./src/nbt/tag.js";
+      import { parseNBT } from "../src/nbt/tag.js";
 
       document.querySelector("#input").addEventListener("change", async ev => {
         const output = document.querySelector("#output");
