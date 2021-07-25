@@ -7,7 +7,7 @@ import {
 } from 'arcsecond';
 import { compoundTag } from '../snbt/collections';
 import { toSNBT } from '../snbt/stringifier';
-import { commaSeparated, withinWhitespace, betweenSquareBrackets } from '../utils';
+import { commaSeparated, withinWhitespace, betweenSquareBrackets, minecraftNamespacedKey } from '../utils';
 
 
 const alphaNumParser = regex(/^[a-z_0-9-\.]+/);
@@ -24,13 +24,7 @@ const blockStateParser = betweenSquareBrackets(
 
 
 const itemParser = sequenceOf([
-    regex(/^(?:[a-z_0-9-\.]+:)?[a-z_0-9-\.\/]+/).map( n => {
-        const parts = n.split(":");
-        if(parts.length == 1){
-            parts.unshift("minecraft");
-        }
-        return parts.join(":");
-    }),
+    minecraftNamespacedKey,
     possibly(blockStateParser),
     // possibly(compoundTag),
     possibly(compoundTag),

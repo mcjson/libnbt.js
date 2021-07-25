@@ -6,7 +6,8 @@ import {
     char,
     sequenceOf,
     anyCharExcept,
-    optionalWhitespace
+    optionalWhitespace,
+    regex
 } from 'arcsecond';
 
 export const typeMap = type => value => ({ type, value });
@@ -32,3 +33,12 @@ export const quotedString = betweenQuotes (joinedMany (choice ([
 
 
 export const commaSeparated = sepBy(withinWhitespace(char(',')));
+
+
+export const minecraftNamespacedKey = regex(/^(?:[a-z_0-9-\.]+:)?[a-z_0-9-\.\/]+$/).map( n => {
+  const parts = n.split(":");
+  if(parts.length == 1){
+      parts.unshift("minecraft");
+  }
+  return parts.join(":");
+})
